@@ -170,7 +170,8 @@ Template.universeSelectize.events({
     },
     'keydown input.js-universeSelectizeInput': function (e, template) {
         var uniSelectize = template.uniSelectize;
-        var itemsUnselected = uniSelectize.itemsUnselected.get()
+        var itemsUnselected = uniSelectize.itemsUnselected.get();
+        var itemsSelected = uniSelectize.itemsSelected.get();
 
         _checkDisabled(template);
 
@@ -210,16 +211,17 @@ Template.universeSelectize.events({
 
                 break;
         }
+
+        if (!template.uniSelectize.multiple && itemsSelected.length) {
+            return false;
+        }
     },
     'keyup input.js-universeSelectizeInput': function (e, template) {
-        var uniSelectize = template.uniSelectize;
-
         _checkDisabled(template);
 
         var $el = $(e.target);
         var value = $el.val();
-
-        uniSelectize.searchText.set(value);
+        template.uniSelectize.searchText.set(value);
     },
     'focus input.js-universeSelectizeInput': function (e, template) {
         _checkDisabled(template);
