@@ -1,12 +1,12 @@
 <template name="universeSelectize">
-    <div class="selectize-control universe-autoform-select {{multipleClass}} {{removeClass}} {{!-- #if isLoading}}loading{{/if --}}">
+    <div class="selectize-control universe-selectize {{multipleClass}} {{removeClass}} {{!-- #if isLoading}}loading{{/if --}}">
         <select name={{name}} multiple="multiple">
             {{#each getItems}}
                 <option value={{value}} selected={{selected}}>{{label}}</option>
             {{/each}}
         </select>
 
-        <div class="selectize-input items not-full has-options has-items {{#if isDisabled}}universe-autoform-select-disabled{{/if}}">
+        <div class="selectize-input items not-full has-options has-items {{#if isDisabled}}universe-selectize-disabled{{/if}}">
             {{#each getItemsSelected}}
                 <div data-value={{value}} class="item">
                     {{label}}
@@ -17,7 +17,7 @@
                 </div>
             {{else}}
                 {{#if getPlaceholder}}
-                    <div class="universe-autoform-select-placeholder">
+                    <div class="universe-selectize-placeholder">
                         {{getPlaceholder}}
                     </div>
                 {{/if}}
