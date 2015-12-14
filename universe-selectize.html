@@ -36,7 +36,12 @@
                     {{#if create}}
                         {{#if getSearchText}}
                             <div data-selectable="" class="create">
-                                Add <strong>{{getSearchText}}</strong>…
+                                {{#if createText}}
+                                    {{{createText}}}
+                                {{else}}
+                                    Add
+                                {{/if}}
+                                <strong>{{getSearchText}}</strong>…
                             </div>
                         {{/if}}
                     {{/if}}

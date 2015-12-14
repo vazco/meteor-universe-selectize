@@ -111,8 +111,6 @@ Template.universeSelectize.onRendered(function () {
         var data = Template.currentData();
         var options = data.options;
 
-        console.log('onRendered');
-
         template.uniSelectize.setItems(options);
     });
 });
@@ -129,7 +127,6 @@ Template.universeSelectize.helpers({
     },
     getItems: function () {
         var template = Template.instance();
-        console.log('items', template.uniSelectize.items.get());
         return template.uniSelectize.items.get();
     },
     getItemsSelected: function () {
