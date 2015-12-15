@@ -139,7 +139,7 @@ Template.universeSelectize.helpers({
         var searchText = template.uniSelectize.searchText.get();
 
         return _.filter(items, function (item) {
-            if (item.label.search(new RegExp(searchText, 'i')) !== -1) {
+            if (item.label && item.label.search(new RegExp(searchText, 'i')) !== -1) {
                 return true;
             }
             return false;
