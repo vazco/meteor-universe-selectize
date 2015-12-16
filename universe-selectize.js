@@ -9,13 +9,20 @@ var uniSelectize = function (options) {
 
     this.multiple = options.multiple;
     this.create   = options.create;
-    this.timeoutId;
 };
 
 uniSelectize.prototype.setItems = function (options) {
     if (!_.isArray(options)) {
-        console.warn('wrong options format');
+        console.warn('invalid options format');
     }
+
+    options = _.filter(options, function (option) {
+        if (!option.value || !option.label) {
+            console.info('invalid option', option);
+            return false;
+        }
+        return true;
+    });
 
     this.items.set(options);
     this.save();
@@ -50,7 +57,7 @@ uniSelectize.prototype.selectItem = function (value) {
         }
     });
 
-    this.items.set(items);
+    this.setItems(items);
     this.save();
 };
 
@@ -63,7 +70,7 @@ uniSelectize.prototype.unselectItem = function (value) {
         }
     });
 
-    this.items.set(items);
+    this.setItems(items);
     this.save();
 };
 
@@ -93,7 +100,7 @@ uniSelectize.prototype.createItem = function (value) {
     };
 
     items.push(item);
-    this.items.set(items);
+    this.setItems(items);
     this.selectItem(value);
 };
 
