@@ -11,24 +11,23 @@ var uniSelectize = function (options) {
     this.create   = options.create;
 };
 
-uniSelectize.prototype.setItems = function (options) {
-    if (!_.isArray(options)) {
+uniSelectize.prototype.setItems = function (items) {
+    if (!_.isArray(items)) {
         console.warn('invalid options format');
     }
 
-    options = _.filter(options, function (option) {
-        if (!option.value || !option.label) {
-            console.info('invalid option', option);
+    items = _.filter(items, function (item) {
+        if (!item.value || !item.label) {
+            console.info('invalid option', item);
             return false;
         }
         return true;
     });
 
-    this.items.set(options);
-    this.save();
+    this.items.set(items);
 };
 
-uniSelectize.prototype.save = function () {
+uniSelectize.prototype.itemsAutorun = function () {
     var items = this.items.get();
     var itemsSelected   = [];
     var itemsUnselected = [];
@@ -58,7 +57,6 @@ uniSelectize.prototype.selectItem = function (value) {
     });
 
     this.setItems(items);
-    this.save();
 };
 
 uniSelectize.prototype.unselectItem = function (value) {
@@ -71,7 +69,6 @@ uniSelectize.prototype.unselectItem = function (value) {
     });
 
     this.setItems(items);
-    this.save();
 };
 
 uniSelectize.prototype.removeLastItem = function () {
@@ -92,16 +89,29 @@ uniSelectize.prototype.selectFirstItem = function () {
     itemToSelect && this.selectItem(itemToSelect.value);
 };
 
-uniSelectize.prototype.createItem = function (value) {
+uniSelectize.prototype.createItem = function () {
+    var searchText = this.searchText.get();
     var items = this.items.get();
+
+    if (!searchText) {
+        return false;
+    }
+
     var item = {
-        label: value,
-        value: value
+        label: searchText,
+        value: searchText
     };
 
-    items.push(item);
+    if (!_.find(items, function (obj) {
+            return obj.value === searchText;
+        })) {
+        items.push(item);
+    }
+
     this.setItems(items);
-    this.selectItem(value);
+    this.selectItem(searchText);
+
+    this.searchText.set('');
 };
 
 
@@ -119,6 +129,10 @@ Template.universeSelectize.onRendered(function () {
         var options = data.options;
 
         template.uniSelectize.setItems(options);
+    });
+
+    template.autorun(function () {
+        template.uniSelectize.itemsAutorun();
     });
 });
 
@@ -209,7 +223,7 @@ Template.universeSelectize.events({
                     uniSelectize.selectFirstItem();
                     $input.val('');
                 } else if (uniSelectize.create) {
-                    uniSelectize.createItem($input.val());
+                    uniSelectize.createItem();
                     $input.val('');
                 }
 
@@ -250,18 +264,31 @@ Template.universeSelectize.events({
     'click .selectize-dropdown-content > div:not(.create)': function (e, template) {
         e.preventDefault();
         _checkDisabled(template);
-
-        var $el = $(e.target);
-        var obj = this;
+        var $input = $(template.find('input'));
 
         template.uniSelectize.selectItem(this.value);
-
-        $(template.find('input')).val('');
+        $input.val('');
 
         if (template.uniSelectize.multiple) {
             Meteor.clearTimeout(template.uniSelectize.timeoutId);
             template.uniSelectize.open.set(true);
-            $(template.find('input')).focus();
+            $input.focus();
+        } else {
+            template.uniSelectize.open.set(false);
+        }
+    },
+    'click .create': function (e, template) {
+        e.preventDefault();
+        _checkDisabled(template);
+        var $input = $(template.find('input'));
+
+        template.uniSelectize.createItem();
+        $input.val('');
+
+        if (template.uniSelectize.multiple) {
+            Meteor.clearTimeout(template.uniSelectize.timeoutId);
+            template.uniSelectize.open.set(true);
+            $input.focus();
         } else {
             template.uniSelectize.open.set(false);
         }
@@ -270,9 +297,7 @@ Template.universeSelectize.events({
         e.preventDefault();
         _checkDisabled(template);
 
-        var item = this;
-
-        template.uniSelectize.unselectItem(item.value);
+        template.uniSelectize.unselectItem(this.value);
     }
 });
 
