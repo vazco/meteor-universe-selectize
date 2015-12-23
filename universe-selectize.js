@@ -219,13 +219,13 @@ Template.universeSelectize.events({
                     break;
                 }
 
-                if (itemsUnselected.length === 1) {
+                //if (itemsUnselected.length === 1) {
                     uniSelectize.selectFirstItem();
                     $input.val('');
-                } else if (uniSelectize.create) {
-                    uniSelectize.createItem();
-                    $input.val('');
-                }
+                //} else if (uniSelectize.create && createOnBlur) {
+                //    uniSelectize.createItem();
+                //    $input.val('');
+                //}
 
                 break;
         }
