@@ -6,7 +6,7 @@
             {{/each}}
         </select>
 
-        <div class="selectize-input items not-full has-options has-items {{#if isDisabled}}universe-selectize-disabled{{/if}}">
+        <div class="selectize-input items not-full has-options has-items {{#if disabled}}disabled{{/if}}">
             {{#each getItemsSelected}}
                 <div data-value={{value}} class="item">
                     {{label}}

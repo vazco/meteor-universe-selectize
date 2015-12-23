@@ -179,7 +179,7 @@ Template.universeSelectize.helpers({
 
 Template.universeSelectize.events({
     'click .selectize-input': function (e, template) {
-        //_checkDisabled(template);
+        _checkDisabled(template);
 
         var $input = $(template.find('input.js-universeSelectizeInput'));
         $input.focus();
