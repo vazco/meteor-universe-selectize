@@ -83,7 +83,7 @@ uniSelectize.prototype.removeLastItem = function () {
 };
 
 uniSelectize.prototype.selectFirstItem = function () {
-    var itemsUnselected = this.itemsUnselected.get();
+    var itemsUnselected = this.getItemsUnselectedFiltered();
     var itemToSelect = itemsUnselected && itemsUnselected[0];
 
     itemToSelect && this.selectItem(itemToSelect.value);
@@ -112,6 +112,18 @@ uniSelectize.prototype.createItem = function () {
     this.selectItem(searchText);
 
     this.searchText.set('');
+};
+
+uniSelectize.prototype.getItemsUnselectedFiltered = function () {
+    var items = this.itemsUnselected.get();
+    var searchText = this.searchText.get();
+
+    return _.filter(items, function (item) {
+        if (item.label && item.label.search(new RegExp(searchText, 'i')) !== -1) {
+            return true;
+        }
+        return false;
+    });
 };
 
 
@@ -156,15 +168,7 @@ Template.universeSelectize.helpers({
     },
     getItemsUnselected: function () {
         var template = Template.instance();
-        var items = template.uniSelectize.itemsUnselected.get();
-        var searchText = template.uniSelectize.searchText.get();
-
-        return _.filter(items, function (item) {
-            if (item.label && item.label.search(new RegExp(searchText, 'i')) !== -1) {
-                return true;
-            }
-            return false;
-        });
+        return template.uniSelectize.getItemsUnselectedFiltered();
     },
     getSearchText: function () {
         var template = Template.instance();
