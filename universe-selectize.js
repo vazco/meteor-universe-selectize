@@ -87,6 +87,12 @@ uniSelectize.prototype.selectFirstItem = function () {
     var itemToSelect = itemsUnselected && itemsUnselected[0];
 
     itemToSelect && this.selectItem(itemToSelect.value);
+
+    if (this.multiple) {
+        this.open.set(true);
+    } else {
+        this.open.set(false);
+    }
 };
 
 uniSelectize.prototype.createItem = function (template) {
@@ -218,6 +224,7 @@ Template.universeSelectize.events({
                 if ($input.val() === '') {
                     uniSelectize.removeLastItem();
                 }
+                uniSelectize.open.set(true);
 
                 break;
 
