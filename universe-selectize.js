@@ -89,9 +89,10 @@ uniSelectize.prototype.selectFirstItem = function () {
     itemToSelect && this.selectItem(itemToSelect.value);
 };
 
-uniSelectize.prototype.createItem = function () {
+uniSelectize.prototype.createItem = function (template) {
     var searchText = this.searchText.get();
     var items = this.items.get();
+    var $input = $(template.find('input'));
 
     if (!searchText) {
         return false;
@@ -112,6 +113,14 @@ uniSelectize.prototype.createItem = function () {
     this.selectItem(searchText);
 
     this.searchText.set('');
+
+    if (this.multiple) {
+        Meteor.clearTimeout(this.timeoutId);
+        this.open.set(true);
+        $input.focus();
+    } else {
+        this.open.set(false);
+    }
 };
 
 uniSelectize.prototype.getItemsUnselectedFiltered = function () {
@@ -228,7 +237,7 @@ Template.universeSelectize.events({
                     uniSelectize.selectFirstItem();
                     $input.val('');
                 } else if (uniSelectize.create /*&& createOnBlur*/) {
-                    uniSelectize.createItem();
+                    uniSelectize.createItem(template);
                     $input.val('');
                 }
 
@@ -287,16 +296,8 @@ Template.universeSelectize.events({
         _checkDisabled(template);
         var $input = $(template.find('input'));
 
-        template.uniSelectize.createItem();
+        template.uniSelectize.createItem(template);
         $input.val('');
-
-        if (template.uniSelectize.multiple) {
-            Meteor.clearTimeout(template.uniSelectize.timeoutId);
-            template.uniSelectize.open.set(true);
-            $input.focus();
-        } else {
-            template.uniSelectize.open.set(false);
-        }
     },
     'click .remove': function (e, template) {
         e.preventDefault();
