@@ -223,13 +223,14 @@ Template.universeSelectize.events({
                     break;
                 }
 
-                //if (itemsUnselected.length === 1) {
+                var itemsUnselected = uniSelectize.getItemsUnselectedFiltered();
+                if (itemsUnselected && itemsUnselected.length > 0) {
                     uniSelectize.selectFirstItem();
                     $input.val('');
-                //} else if (uniSelectize.create && createOnBlur) {
-                //    uniSelectize.createItem();
-                //    $input.val('');
-                //}
+                } else if (uniSelectize.create /*&& createOnBlur*/) {
+                    uniSelectize.createItem();
+                    $input.val('');
+                }
 
                 break;
         }
