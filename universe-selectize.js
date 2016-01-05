@@ -40,8 +40,16 @@ uniSelectize.prototype.itemsAutorun = function () {
         }
     });
 
-    this.itemsSelected.set(itemsSelected.sort());
-    this.itemsUnselected.set(itemsUnselected.sort());
+    itemsSelected = _.sortBy(itemsSelected, function (item) {
+        return item.label;
+    });
+
+    itemsUnselected = _.sortBy(itemsUnselected, function (item) {
+        return item.label;
+    });
+
+    this.itemsSelected.set(itemsSelected);
+    this.itemsUnselected.set(itemsUnselected);
 };
 
 uniSelectize.prototype.selectItem = function (value) {
