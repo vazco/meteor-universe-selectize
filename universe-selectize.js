@@ -51,8 +51,10 @@ uniSelectize.prototype.itemsAutorun = function (template) {
     this.itemsSelected.set(itemsSelected);
     this.itemsUnselected.set(itemsUnselected);
 
-    var $select = $(template.find('select'));
-    $select.change();
+    Meteor.defer(function () {
+        var $select = $(template.find('select'));
+        $select.change();
+    });
 };
 
 uniSelectize.prototype.selectItem = function (value) {
