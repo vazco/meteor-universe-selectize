@@ -27,7 +27,7 @@ uniSelectize.prototype.setItems = function (items) {
     this.items.set(items);
 };
 
-uniSelectize.prototype.itemsAutorun = function (template) {
+uniSelectize.prototype.itemsAutorun = function () {
     var items = this.items.get();
     var itemsSelected   = [];
     var itemsUnselected = [];
@@ -50,9 +50,12 @@ uniSelectize.prototype.itemsAutorun = function (template) {
 
     this.itemsSelected.set(itemsSelected);
     this.itemsUnselected.set(itemsUnselected);
+};
 
+uniSelectize.prototype.itemsSelectedAutorun = function (template) {
+    template.uniSelectize.itemsSelected.get();
+    var $select = $(template.find('select'));
     Meteor.defer(function () {
-        var $select = $(template.find('select'));
         $select.change();
     });
 };
@@ -222,6 +225,10 @@ Template.universeSelectize.onRendered(function () {
 
     template.autorun(function () {
         template.uniSelectize.itemsAutorun(template);
+    });
+
+    template.autorun(function () {
+        template.uniSelectize.itemsSelectedAutorun(template)
     });
 });
 
