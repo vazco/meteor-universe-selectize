@@ -6,7 +6,9 @@
             {{/each}}
         </select>
 
-        <div class="selectize-input items not-full has-options has-items {{#if disabled}}disabled{{/if}}">
+        <div class="selectize-input items not-full has-options has-items
+                    {{#if disabled}}disabled{{/if}}
+                    {{#if open}}focus input-active dropdown-active{{/if}}">
             {{#each getItemsSelected}}
                 <div data-value={{value}} class="item">
                     {{label}}

@@ -27,7 +27,7 @@ uniSelectize.prototype.setItems = function (items) {
     this.items.set(items);
 };
 
-uniSelectize.prototype.itemsAutorun = function () {
+uniSelectize.prototype.itemsAutorun = function (template) {
     var items = this.items.get();
     var itemsSelected   = [];
     var itemsUnselected = [];
@@ -50,6 +50,9 @@ uniSelectize.prototype.itemsAutorun = function () {
 
     this.itemsSelected.set(itemsSelected);
     this.itemsUnselected.set(itemsUnselected);
+
+    var $select = $(template.find('select'));
+    $select.change();
 };
 
 uniSelectize.prototype.selectItem = function (value) {
@@ -150,6 +153,55 @@ uniSelectize.prototype.getItemsUnselectedFiltered = function () {
 };
 
 
+uniSelectize.prototype.checkDisabled = function (template) {
+    if (template.data.disabled) {
+        throw new Meteor.Error('This field is disabled');
+    }
+};
+
+uniSelectize.prototype.measureString = function (str, $parent) {
+    if (!str) {
+        return 0;
+    }
+
+    var $test = $('<test>').css({
+        position: 'absolute',
+        top: -99999,
+        left: -99999,
+        width: 'auto',
+        padding: 0,
+        whiteSpace: 'pre'
+    }).text(str).appendTo('body');
+
+    this.transferStyles($parent, $test, [
+        'letterSpacing',
+        'fontSize',
+        'fontFamily',
+        'fontWeight',
+        'textTransform'
+    ]);
+
+    var width = $test.width();
+    $test.remove();
+
+    return width;
+};
+
+uniSelectize.prototype.transferStyles = function ($from, $to, properties) {
+    var i, n, styles = {};
+
+    if (properties) {
+        for (i = 0, n = properties.length; i < n; i++) {
+            styles[properties[i]] = $from.css(properties[i]);
+        }
+    } else {
+        styles = $from.css();
+    }
+
+    $to.css(styles);
+};
+
+
 
 Template.universeSelectize.onCreated(function () {
     var template = this;
@@ -167,10 +219,9 @@ Template.universeSelectize.onRendered(function () {
     });
 
     template.autorun(function () {
-        template.uniSelectize.itemsAutorun();
+        template.uniSelectize.itemsAutorun(template);
     });
 });
-
 
 Template.universeSelectize.helpers({
     multipleClass: function () {
@@ -206,7 +257,7 @@ Template.universeSelectize.helpers({
 
 Template.universeSelectize.events({
     'click .selectize-input': function (e, template) {
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         var $input = $(template.find('input.js-universeSelectizeInput'));
         $input.focus();
@@ -215,15 +266,13 @@ Template.universeSelectize.events({
     },
     'keydown input.js-universeSelectizeInput': function (e, template) {
         var uniSelectize = template.uniSelectize;
-        var itemsUnselected = uniSelectize.itemsUnselected.get();
         var itemsSelected = uniSelectize.itemsSelected.get();
+        var itemsUnselected = uniSelectize.getItemsUnselectedFiltered();
 
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         var $input = $(e.target);
-        var width = _measureString($input.val(), $input) + 10;
-
-        var $createItem = $(template.find('.selectize-dropdown-content > div.create'));
+        var width = template.uniSelectize.measureString($input.val(), $input) + 10;
 
         $input.width(width);
 
@@ -247,7 +296,6 @@ Template.universeSelectize.events({
                     break;
                 }
 
-                var itemsUnselected = uniSelectize.getItemsUnselectedFiltered();
                 if (itemsUnselected && itemsUnselected.length > 0) {
                     uniSelectize.selectFirstItem();
                     $input.val('');
@@ -264,27 +312,27 @@ Template.universeSelectize.events({
         }
     },
     'keyup input.js-universeSelectizeInput': function (e, template) {
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         var $el = $(e.target);
         var value = $el.val();
         template.uniSelectize.searchText.set(value);
     },
     'focus input.js-universeSelectizeInput': function (e, template) {
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         template.uniSelectize.open.set(true);
         Meteor.clearTimeout(template.uniSelectize.timeoutId);
     },
     'change input.js-universeSelectizeInput': function(e, template) {
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         // prevent non-autoform fields changes from submitting the form when autosave is enabled
         e.preventDefault();
         e.stopPropagation();
     },
     'blur input.js-universeSelectizeInput': function (e, template) {
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         template.uniSelectize.timeoutId = Meteor.setTimeout(function () {
             template.uniSelectize.open.set(false);
@@ -292,7 +340,7 @@ Template.universeSelectize.events({
     },
     'click .selectize-dropdown-content > div:not(.create)': function (e, template) {
         e.preventDefault();
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
         var $input = $(template.find('input'));
 
         template.uniSelectize.selectItem(this.value);
@@ -308,7 +356,7 @@ Template.universeSelectize.events({
     },
     'click .create': function (e, template) {
         e.preventDefault();
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
         var $input = $(template.find('input'));
 
         template.uniSelectize.createItem(template);
@@ -316,62 +364,8 @@ Template.universeSelectize.events({
     },
     'click .remove': function (e, template) {
         e.preventDefault();
-        _checkDisabled(template);
+        template.uniSelectize.checkDisabled(template);
 
         template.uniSelectize.unselectItem(this.value);
     }
 });
-
-
-var _checkDisabled = function (template) {
-    if (template.data.disabled) {
-        throw new Meteor.Error('This field is disabled');
-    }
-};
-
-
-
-
-// from selectize utils https://github.com/brianreavis/selectize.js/blob/master/src/utils.js
-
-var _measureString = function (str, $parent) {
-    if (!str) {
-        return 0;
-    }
-
-    var $test = $('<test>').css({
-        position: 'absolute',
-        top: -99999,
-        left: -99999,
-        width: 'auto',
-        padding: 0,
-        whiteSpace: 'pre'
-    }).text(str).appendTo('body');
-
-    _transferStyles($parent, $test, [
-        'letterSpacing',
-        'fontSize',
-        'fontFamily',
-        'fontWeight',
-        'textTransform'
-    ]);
-
-    var width = $test.width();
-    $test.remove();
-
-    return width;
-};
-
-var _transferStyles = function ($from, $to, properties) {
-    var i, n, styles = {};
-
-    if (properties) {
-        for (i = 0, n = properties.length; i < n; i++) {
-            styles[properties[i]] = $from.css(properties[i]);
-        }
-    } else {
-        styles = $from.css();
-    }
-
-    $to.css(styles);
-};
