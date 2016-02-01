@@ -14,11 +14,11 @@ Package.onUse(function(api) {
         };
     }
 
-    api.use('ecmascript');
-    api.use('less');
-    api.use('templating');
+    api.use('ecmascript@0.1.6');
+    api.use('less@2.5.1');
+    api.use('templating@1.1.5');
 
-    api.use(['underscore', 'reactive-var'], 'client');
+    api.use(['underscore@1.0.4', 'reactive-var@1.0.6'], 'client');
 
     api.addFiles([
         'universe-selectize.html',
