@@ -47,7 +47,7 @@
                 {{/each}}
                 {{#if create}}
                     {{#if getSearchText}}
-                        <div data-selectable="" class="create">
+                        <div data-selectable="" class="create {{#if activeOption 'create'}}active{{/if}}">
                             {{#if createText}}
                                 {{{createText}}}
                             {{else}}

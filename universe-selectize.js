@@ -23,6 +23,8 @@ UniSelectize.prototype.setItems = function (items, value) {
         console.warn('invalid options format');
     }
 
+    var values = value && (_.isArray(value) ? value : [value]);
+
     items = _.filter(items, function (item) {
         if (!item.value || !item.label) {
             console.info('invalid option', item);
@@ -35,23 +37,20 @@ UniSelectize.prototype.setItems = function (items, value) {
         return item.value;
     });
 
-    if (_.isArray(value)) {
-        _.each(value, function (val) {
-            if (!_.contains(itemValues, val) && val) {
-                items.push({
-                    value: val,
-                    label: val,
-                    selected: true
-                });
-            }
-        });
-    } else if (!_.contains(itemValues, value) && value) {
-        items.push({
-            value: value,
-            label: value,
-            selected: true
-        });
-    }
+    _.each(values, function (val) {
+        if (!_.contains(itemValues, val) && val) {
+            items.push({
+                value: val,
+                label: val
+            });
+        }
+    });
+
+    _.each(items, function (item) {
+        if (_.contains(values, item.value)) {
+            item.selected = true;
+        }
+    });
 
     this.items.set(items);
 };
@@ -166,6 +165,11 @@ UniSelectize.prototype.selectActiveItem = function (template) {
     var activeOption = this.activeOption.get();
     var itemToSelect = itemsUnselected && itemsUnselected[activeOption];
 
+    if (activeOption === itemsUnselected.length && this.create) {
+        this.createItem(template);
+        return;
+    }
+
     itemToSelect && this.selectItem(itemToSelect.value);
 
     if (this.multiple) {
@@ -177,6 +181,7 @@ UniSelectize.prototype.selectActiveItem = function (template) {
 };
 
 UniSelectize.prototype.createItem = function (template) {
+    var self = this;
     var searchText = this.searchText.get();
     var items = this.items.get();
     var $input = $(template.find('input'));
@@ -191,7 +196,15 @@ UniSelectize.prototype.createItem = function (template) {
     };
 
     if (template.uniSelectize.createMethod) {
-        Meteor.call(template.uniSelectize.createMethod, searchText, searchText);
+        Meteor.call(template.uniSelectize.createMethod, searchText, searchText, function () {
+            var itemsSelected = self.itemsSelected.get();
+            Meteor.defer(function () {
+                _.each(itemsSelected, function (item) {
+                    self.selectItem(item.value);
+                });
+                self.inputFocus(template);
+            });
+        });
     }
 
     if (!_.find(items, function (obj) {
@@ -200,15 +213,12 @@ UniSelectize.prototype.createItem = function (template) {
         items.push(item);
     }
 
-    this.setItems(items);
-    this.selectItem(searchText);
+    this.setItems(items, searchText);
 
     this.searchText.set('');
 
     if (this.multiple) {
-        Meteor.clearTimeout(this.timeoutId);
-        this.open.set(true);
-        $input.focus();
+        this.inputFocus(template);
     } else {
         this.open.set(false);
     }
@@ -338,6 +348,13 @@ Template.universeSelectize.helpers({
     activeOption: function (position) {
         var template = Template.instance();
         var activeOption = template.uniSelectize.activeOption.get();
+        var itemsUnselected = template.uniSelectize.getItemsUnselectedFiltered();
+        var createOption = template.uniSelectize.create;
+
+        if (activeOption === itemsUnselected.length && createOption) {
+            return position === 'create';
+        }
+
         return position === activeOption;
     },
     getPlaceholder: function () {
@@ -356,9 +373,7 @@ Template.universeSelectize.helpers({
 Template.universeSelectize.events({
     'click .selectize-input': function (e, template) {
         template.uniSelectize.checkDisabled(template);
-
-        var $input = $(template.find('input.js-universeSelectizeInput'));
-        $input.focus();
+        template.uniSelectize.inputFocus(template);
 
         //_getOptionsFromMethod($input.val(), null, template);
     },
@@ -441,7 +456,8 @@ Template.universeSelectize.events({
                 }
                 break;
             case 40:    // down
-                if (activeOption < itemsUnselected.length - 1) {
+                if (activeOption < itemsUnselected.length - 1 ||
+                    (activeOption < itemsUnselected.length && uniSelectize.create)) {
                     uniSelectize.activeOption.set(activeOption + 1);
                 }
                 break;
@@ -460,8 +476,8 @@ Template.universeSelectize.events({
     },
     'focus input.js-universeSelectizeInput': function (e, template) {
         template.uniSelectize.checkDisabled(template);
-
         template.uniSelectize.open.set(true);
+
         Meteor.clearTimeout(template.uniSelectize.timeoutId);
     },
     'change input.js-universeSelectizeInput': function(e, template) {
@@ -487,9 +503,7 @@ Template.universeSelectize.events({
         $input.val('');
 
         if (template.uniSelectize.multiple) {
-            Meteor.clearTimeout(template.uniSelectize.timeoutId);
-            template.uniSelectize.open.set(true);
-            $input.focus();
+            template.uniSelectize.inputFocus(template);
         } else {
             template.uniSelectize.open.set(false);
         }
