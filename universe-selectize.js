@@ -77,7 +77,11 @@ UniSelectize.prototype.itemsAutorun = function () {
         return item.label;
     });
 
-    this.itemsSelected.set(itemsSelected);
+    var itemsSelectedPrev = this.itemsSelected.get();
+    if (!_.isEqual(itemsSelectedPrev, itemsSelected)) {
+        this.itemsSelected.set(itemsSelected);
+    }
+
     this.itemsUnselected.set(itemsUnselected);
 };
 
