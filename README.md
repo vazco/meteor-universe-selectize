@@ -63,7 +63,7 @@ $ meteor add vazco:universe-selectize
 		<td valign="top"><code>false</code></td>
 	</tr>
 	<tr>
-        <td valign="top"><code>remove_button</code></td>
+        <td valign="top"><code>removeButton</code></td>
         <td valign="top"><i>Optional.</i> </td>
         <td valign="top"><code>Boolean</code></td>
         <td valign="top"><code>true</code></td>
@@ -73,5 +73,11 @@ $ meteor add vazco:universe-selectize
         <td valign="top"><i>Optional. Allows the user to create a new items that aren't in the list of options.</i> </td>
         <td valign="top"><code>Boolean</code></td>
         <td valign="top"><code>true</code></td>
+    </tr>
+    <tr>
+        <td valign="top"><code>placeholder</code></td>
+        <td valign="top"><i>Optional.</i> A placeholder option.</td>
+        <td valign="top"><code>String</code></td>
+        <td valign="top"><code>null</code></td>
     </tr>
 </table>
