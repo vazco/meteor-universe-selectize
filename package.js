@@ -16,7 +16,7 @@ Package.onUse(function(api) {
         };
     }
 
-    api.use('ecmascript@');
+    api.use('ecmascript');
     api.use('less');
     api.use('templating');
 
