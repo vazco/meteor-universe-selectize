@@ -2,7 +2,7 @@
     <div class="selectize-control universe-selectize
                 {{#if multiple}}multi{{else}}single{{/if}}
                 {{#if removeButton}}plugin-remove_button{{/if}}
-                {{!-- #if isLoading}}loading{{/if --}}">
+                {{#if loading}}loading{{/if}}">
         <select name={{name}} multiple={{multiple}} id={{id}} data-schema-key={{dataSchemaKey}}>
             <option value=""></option>
             {{#each getItems}}

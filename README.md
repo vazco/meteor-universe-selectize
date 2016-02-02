@@ -51,6 +51,12 @@ $ meteor add vazco:universe-selectize
 		<td valign="top"><code>undefined</code></td>
 	</tr>
 	<tr>
+        <td valign="top"><code>placeholder</code></td>
+        <td valign="top"><i>Optional.</i> A placeholder option.</td>
+        <td valign="top"><code>String</code></td>
+        <td valign="top"><code>null</code></td>
+    </tr>
+	<tr>
         <td valign="top"><code>disabled</code></td>
         <td valign="top"><i>Optional.</i></td>
         <td valign="top"><code>Boolean</code></td>
@@ -81,9 +87,15 @@ $ meteor add vazco:universe-selectize
         <td valign="top"><code>undefined</code></td>
     </tr>
     <tr>
-        <td valign="top"><code>placeholder</code></td>
-        <td valign="top"><i>Optional.</i> A placeholder option.</td>
-        <td valign="top"><code>String</code></td>
-        <td valign="top"><code>null</code></td>
+        <td valign="top"><code>optionsMethod</code></td>
+        <td valign="top"><i>Optional. Name of method to get more items. Method should return array of options.</i> </td>
+        <td valign="top"><code>function (query)</code></td>
+        <td valign="top"><code>undefined</code></td>
+    </tr>
+    <tr>
+        <td valign="top"><code>optionsMethodParams</code></td>
+        <td valign="top"><i>Optional. Additional params for optionsMethod.</i> </td>
+        <td valign="top"><code>Object</code></td>
+        <td valign="top"><code>undefined</code></td>
     </tr>
 </table>

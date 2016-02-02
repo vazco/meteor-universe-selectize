@@ -6,16 +6,19 @@ UniSelectize = function (options) {
     this.itemsSelected   = new ReactiveVar([]);
     this.itemsUnselected = new ReactiveVar([]);
 
-    this.open          = new ReactiveVar(false);
-    this.searchText    = new ReactiveVar();
-    this.activeOption  = new ReactiveVar(-1);
-    this.inputPosition = new ReactiveVar(-1);
+    this.open                = new ReactiveVar(false);
+    this.loading             = new ReactiveVar(false);
+    this.searchText          = new ReactiveVar();
+    this.activeOption        = new ReactiveVar(-1);
+    this.inputPosition       = new ReactiveVar(-1);
+    this.optionsMethodParams = new ReactiveVar();
 
-    this.create       = options.create;
-    this.multiple     = options.multiple;
-    this.placeholder  = options.placeholder;
-    this.removeButton = options.removeButton !== false;
-    this.createMethod = options.createMethod;
+    this.create        = options.create;
+    this.multiple      = options.multiple;
+    this.placeholder   = options.placeholder;
+    this.removeButton  = options.removeButton !== false;
+    this.createMethod  = options.createMethod;
+    this.optionsMethod = options.optionsMethod;
 };
 
 UniSelectize.prototype.setItems = function (items, value) {
@@ -50,6 +53,58 @@ UniSelectize.prototype.setItems = function (items, value) {
         if (_.contains(values, item.value)) {
             item.selected = true;
         }
+    });
+
+    this.items.set(items);
+};
+
+UniSelectize.prototype.addItems = function (newItems, value) {
+    if (!_.isArray(newItems)) {
+        console.warn('invalid options format');
+    }
+
+    var values = value && (_.isArray(value) ? value : [value]);
+    var items = this.items.get();
+    var itemsValues = items.map(function (item) {
+        return item.value;
+    });
+
+    _.each(newItems, function (newItem) {
+        if (!newItem.value || !newItem.label) {
+            console.info('invalid option', newItem);
+            return;
+        }
+
+        if (!_.contains(itemsValues, newItem.value)) {
+            var item = {
+                value: newItem.value,
+                label: newItem.label
+            };
+
+            if (_.contains(values, newItem.value)) {
+                item.selected = true;
+            }
+
+            items.push(item);
+        }
+    });
+
+    this.items.set(items);
+};
+
+
+UniSelectize.prototype.removeUnusedItems = function (newItems) {
+    if (!_.isArray(newItems)) {
+        console.warn('invalid options format');
+    }
+
+    var items = this.items.get();
+    var newItemsValues = newItems.map(function (item) {
+        return item.value;
+    });
+
+    items = _.filter(items, function (item) {
+        return _.contains(newItemsValues, item.value);
     });
 
     this.items.set(items);
@@ -215,8 +270,6 @@ UniSelectize.prototype.createItem = function (template) {
 
     this.setItems(items, searchText);
 
-    this.searchText.set('');
-
     if (this.multiple) {
         this.inputFocus(template);
     } else {
@@ -285,7 +338,33 @@ UniSelectize.prototype.transferStyles = function ($from, $to, properties) {
     $to.css(styles);
 };
 
+UniSelectize.prototype.getOptionsFromMethod = function (values) {
+    var self = this;
+    var methodName = this.optionsMethod;
+    var searchText = this.searchText.get();
+    var params = this.optionsMethodParams.get();
 
+    if (!methodName) {
+        return false;
+    }
+
+    var searchVal = {
+        searchText: searchText,
+        values: values || [],
+        params: params || null
+    };
+
+    self.loading.set(true);
+    Meteor.call(methodName, searchVal, function (err, options) {
+        self.loading.set(false);
+        if (params) {
+            self.removeUnusedItems(options);
+            self.addItems(options);
+        } else {
+            self.addItems(options, values);
+        }
+    });
+};
 
 Template.universeSelectize.onCreated(function () {
     var template = this;
@@ -297,9 +376,14 @@ Template.universeSelectize.onRendered(function () {
 
     template.autorun(function () {
         var data = Template.currentData();
-        var value   = data.value;
-        var options = data.options;
-        template.uniSelectize.setItems(options, value);
+        var value = data.value;
+
+        if (template.uniSelectize.optionsMethod) {
+            template.uniSelectize.getOptionsFromMethod(value);
+        } else {
+            var options = data.options;
+            template.uniSelectize.setItems(options, value);
+        }
     });
 
     template.autorun(function () {
@@ -308,6 +392,14 @@ Template.universeSelectize.onRendered(function () {
 
     template.autorun(function () {
         template.uniSelectize.itemsSelectedAutorun(template)
+    });
+
+    template.autorun(function () {
+        var data = Template.currentData();
+        var methodParams = data.optionsMethodParams;
+        var params = _.isFunction(methodParams) ? methodParams() : methodParams;
+
+        template.uniSelectize.optionsMethodParams.set(params);
     });
 });
 
@@ -339,6 +431,10 @@ Template.universeSelectize.helpers({
     open: function () {
         var template = Template.instance();
         return template.uniSelectize.open.get();
+    },
+    loading: function () {
+        var template = Template.instance();
+        return template.uniSelectize.loading.get();
     },
     inputPosition: function (position) {
         var template = Template.instance();
@@ -375,7 +471,7 @@ Template.universeSelectize.events({
         template.uniSelectize.checkDisabled(template);
         template.uniSelectize.inputFocus(template);
 
-        //_getOptionsFromMethod($input.val(), null, template);
+        template.uniSelectize.getOptionsFromMethod();
     },
     'keydown input.js-universeSelectizeInput': function (e, template) {
         var uniSelectize = template.uniSelectize;
@@ -393,9 +489,8 @@ Template.universeSelectize.events({
 
         switch (e.keyCode) {
             case 8: // backspace
-                //e.preventDefault();
-                //e.stopPropagation();
                 if ($input.val() === '') {
+                    e.preventDefault();
                     uniSelectize.removeItemBeforeInput();
                 }
                 uniSelectize.open.set(true);
@@ -425,9 +520,11 @@ Template.universeSelectize.events({
 
                 if (itemsUnselected && itemsUnselected.length > 0) {
                     uniSelectize.selectActiveItem(template);
+                    uniSelectize.searchText.set('');
                     $input.val('');
                 } else if (uniSelectize.create /*&& createOnBlur*/) {
                     uniSelectize.createItem(template);
+                    uniSelectize.searchText.set('');
                     $input.val('');
                 }
 
@@ -473,6 +570,7 @@ Template.universeSelectize.events({
         var $el = $(e.target);
         var value = $el.val();
         template.uniSelectize.searchText.set(value);
+        template.uniSelectize.getOptionsFromMethod();
     },
     'focus input.js-universeSelectizeInput': function (e, template) {
         template.uniSelectize.checkDisabled(template);
@@ -500,6 +598,7 @@ Template.universeSelectize.events({
         var $input = $(template.find('input'));
 
         template.uniSelectize.selectItem(this.value);
+        template.uniSelectize.searchText.set('');
         $input.val('');
 
         if (template.uniSelectize.multiple) {
@@ -514,6 +613,7 @@ Template.universeSelectize.events({
         var $input = $(template.find('input'));
 
         template.uniSelectize.createItem(template);
+        template.uniSelectize.searchText.set('');
         $input.val('');
     },
     'click .remove': function (e, template) {
