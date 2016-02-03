@@ -607,6 +607,19 @@ Template.universeSelectize.events({
             template.uniSelectize.open.set(false);
         }
     },
+    'mouseenter .selectize-dropdown-content > div': function (e, template) {
+        var $el = $(e.target);
+        var elIndex = $el.attr('data-index');
+        var itemsUnselected = template.uniSelectize.getItemsUnselectedFiltered();
+
+        if (elIndex === 'create') {
+            elIndex = itemsUnselected.length;
+        } else {
+            elIndex = parseInt(elIndex);
+        }
+
+        template.uniSelectize.activeOption.set(elIndex);
+    },
     'click .create': function (e, template) {
         e.preventDefault();
         template.uniSelectize.checkDisabled(template);
