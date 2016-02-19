@@ -19,6 +19,7 @@ UniSelectize = function (options) {
     this.removeButton  = options.removeButton !== false;
     this.createMethod  = options.createMethod;
     this.optionsMethod = options.optionsMethod;
+    this.sortMethod    = options.sortMethod ? options.sortMethod : 'label';
 };
 
 UniSelectize.prototype.setItems = function (items, value) {
@@ -123,13 +124,9 @@ UniSelectize.prototype.itemsAutorun = function () {
         }
     });
 
-    itemsSelected = _.sortBy(itemsSelected, function (item) {
-        return item.label;
-    });
+    itemsSelected = _.sortBy(itemsSelected, this.sortMethod);
 
-    itemsUnselected = _.sortBy(itemsUnselected, function (item) {
-        return item.label;
-    });
+    itemsUnselected = _.sortBy(itemsUnselected, this.sortMethod);
 
     var itemsSelectedPrev = this.itemsSelected.get();
     if (!_.isEqual(itemsSelectedPrev, itemsSelected)) {
