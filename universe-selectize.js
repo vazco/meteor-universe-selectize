@@ -19,7 +19,7 @@ UniSelectize = function (options) {
     this.removeButton  = options.removeButton !== false;
     this.createMethod  = options.createMethod;
     this.optionsMethod = options.optionsMethod;
-    this.sortMethod    = options.sortMethod ? options.sortMethod : 'label';
+    this.sortMethod    = _.isUndefined(options.sortMethod) ? 'label' : options.sortMethod;
 };
 
 UniSelectize.prototype.setItems = function (items, value) {
