@@ -89,7 +89,7 @@ $ meteor add vazco:universe-selectize
     <tr>
         <td valign="top"><code>optionsMethod</code></td>
         <td valign="top"><i>Optional. Name of method to get more items. Method should return array of options.</i> </td>
-        <td valign="top"><code>function (query)</code></td>
+        <td valign="top"><code>String</code></td>
         <td valign="top"><code>undefined</code></td>
     </tr>
     <tr>
@@ -97,5 +97,11 @@ $ meteor add vazco:universe-selectize
         <td valign="top"><i>Optional. Additional params for optionsMethod.</i> </td>
         <td valign="top"><code>Object</code></td>
         <td valign="top"><code>undefined</code></td>
+    </tr>
+    <tr>
+        <td valign="top"><code>sortMethod</code></td>
+        <td valign="top"><i>Optional.</i> </td>
+        <td valign="top"><code>Function</code></td>
+        <td valign="top"><code>'label'</code></td>
     </tr>
 </table>
