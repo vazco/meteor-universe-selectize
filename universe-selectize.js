@@ -168,11 +168,11 @@ UniSelectize.prototype.selectItem = function (value) {
     this.setItems(items);
 };
 
-UniSelectize.prototype.unselectItem = function (value) {
+UniSelectize.prototype.unselectItem = function (value, reset) {
     var items = this.items.get();
 
     _.each(items, function (item) {
-        if (item.value === value) {
+        if (item.value === value || reset) {
             item.selected = false;
         }
     });
@@ -398,6 +398,17 @@ Template.universeSelectize.onRendered(function () {
 
         template.uniSelectize.optionsMethodParams.set(params);
     });
+
+    this.form = $(template.find('select')).parents('form');
+    this.form.bind('reset', function () {
+        template.uniSelectize.unselectItem(null, true);
+    });
+});
+
+Template.universeSelectize.onDestroyed(function () {
+    if (this.form) {
+        this.form.unbind('reset');
+    }
 });
 
 Template.universeSelectize.helpers({
