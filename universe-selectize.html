@@ -41,7 +41,7 @@
         <div class="selectize-dropdown js-selectize-dropdown {{#unless open}}hidden{{/unless}}">
             <div class="selectize-dropdown-content">
                 {{#each getItemsUnselected}}
-                    <div data-value={{value}} data-index={{@index}} data-selectable class="option {{#if activeOption @index}}active{{/if}}">
+                    <div data-value={{value}} data-index={{@index}} data-selectable class="option {{#if activeOption @index}}active{{/if}} {{isPlaceholder}}">
                         {{label}}
                     </div>
                 {{/each}}

@@ -13,13 +13,15 @@ UniSelectize = function (options) {
     this.inputPosition       = new ReactiveVar(-1);
     this.optionsMethodParams = new ReactiveVar();
 
-    this.create        = options.create;
-    this.multiple      = options.multiple;
-    this.placeholder   = options.placeholder;
-    this.removeButton  = options.removeButton !== false;
-    this.createMethod  = options.createMethod;
-    this.optionsMethod = options.optionsMethod;
-    this.sortMethod    = _.isUndefined(options.sortMethod) ? 'label' : options.sortMethod;
+    this.create             = options.create;
+    this.multiple           = options.multiple;
+    this.sortMethod         = _.isUndefined(options.sortMethod) ? 'label' : options.sortMethod;
+    this.placeholder        = options.placeholder;
+    this.removeButton       = options.removeButton !== false;
+    this.createMethod       = options.createMethod;
+    this.optionsMethod      = options.optionsMethod;
+    this.optionsPlaceholder = options.optionsPlaceholder;
+
 };
 
 UniSelectize.prototype.setItems = function (items, value) {
@@ -133,6 +135,13 @@ UniSelectize.prototype.itemsAutorun = function () {
         this.itemsSelected.set(itemsSelected);
     }
 
+    if (this.placeholder && this.optionsPlaceholder && itemsSelected.length) {
+        itemsUnselected.unshift({
+            value: '',
+            label: _.isString(this.optionsPlaceholder) ? this.optionsPlaceholder: this.placeholder
+        });
+    }
+
     this.itemsUnselected.set(itemsUnselected);
 };
 
@@ -158,7 +167,9 @@ UniSelectize.prototype.selectItem = function (value) {
     var multiple = this.multiple;
 
     _.each(items, function (item) {
-        if (item.value === value) {
+        if (value === '') {
+            item.selected = false;
+        } else if (item.value === value) {
             item.selected = true;
         } else if (!multiple) {
             item.selected = false;
@@ -470,6 +481,9 @@ Template.universeSelectize.helpers({
         }
 
         return template.uniSelectize.placeholder;
+    },
+    isPlaceholder: function () {
+        return this.value === '' ? 'uniPlaceholder' : '';
     }
 });
 

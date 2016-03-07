@@ -56,6 +56,12 @@ $ meteor add vazco:universe-selectize
         <td valign="top"><code>String</code></td>
         <td valign="top"><code>null</code></td>
     </tr>
+    <tr>
+        <td valign="top"><code>optionsPlaceholder</code></td>
+        <td valign="top"><i>Optional.</i> Show placeholder in options dropdown.</td>
+        <td valign="top"><code>Boolean or String</code></td>
+        <td valign="top"><code>false</code></td>
+    </tr>
 	<tr>
         <td valign="top"><code>disabled</code></td>
         <td valign="top"><i>Optional.</i></td>
