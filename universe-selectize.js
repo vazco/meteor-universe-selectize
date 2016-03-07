@@ -29,9 +29,14 @@ UniSelectize.prototype.setItems = function (items, value) {
 
     var values = value && (_.isArray(value) ? value : [value]);
 
+    // item require label and value (empty string is also a valid value)
     items = _.filter(items, function (item) {
-        if (!item.value || !item.label) {
-            console.info('invalid option', item);
+        if (!item.label) {
+            console.warn('[universe-selectize] option is missing a label:', item);
+            return false;
+        }
+        if (!item.value && item.value !== '') {
+            console.warn('[universe-selectize] option is missing a value:', item);
             return false;
         }
         return true;
