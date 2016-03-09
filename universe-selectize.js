@@ -135,7 +135,7 @@ UniSelectize.prototype.itemsAutorun = function () {
         this.itemsSelected.set(itemsSelected);
     }
 
-    if (this.placeholder && this.optionsPlaceholder && itemsSelected.length) {
+    if (this.placeholder && this.optionsPlaceholder) {
         itemsUnselected.unshift({
             value: '',
             label: _.isString(this.optionsPlaceholder) ? this.optionsPlaceholder: this.placeholder
@@ -618,12 +618,14 @@ Template.universeSelectize.events({
         e.preventDefault();
         template.uniSelectize.checkDisabled(template);
         var $input = $(template.find('input'));
+        var itemsUnselected = template.uniSelectize.getItemsUnselectedFiltered();
+        var itemsUnselectedLength = itemsUnselected && itemsUnselected.length;
 
         template.uniSelectize.selectItem(this.value);
         template.uniSelectize.searchText.set('');
         $input.val('');
 
-        if (template.uniSelectize.multiple) {
+        if (template.uniSelectize.multiple && itemsUnselectedLength && this.value) {
             template.uniSelectize.inputFocus(template);
         } else {
             template.uniSelectize.open.set(false);
