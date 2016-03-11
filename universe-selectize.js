@@ -90,6 +90,11 @@ UniSelectize.prototype.addItems = function (newItems, value) {
             }
 
             items.push(item);
+        } else if (typeof newItem.selected !== 'undefined') {
+            var item = _.find(items, function (item) {
+                return item.value === newItem.value;
+            });
+            item.selected = newItem.selected;
         }
     });
 
