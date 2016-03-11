@@ -81,7 +81,8 @@ UniSelectize.prototype.addItems = function (newItems, value) {
         if (!_.contains(itemsValues, newItem.value)) {
             var item = {
                 value: newItem.value,
-                label: newItem.label
+                label: newItem.label,
+                selected: newItem.selected
             };
 
             if (_.contains(values, newItem.value)) {
