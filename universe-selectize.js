@@ -423,8 +423,7 @@ Template.universeSelectize.onRendered(function () {
 
     this.form = $(template.find('select')).parents('form');
     this.form.bind('reset', function () {
-        template.uniSelectize.un
-        (null, true);
+        template.uniSelectize.unselectItem(null, true);
     });
 });
 
