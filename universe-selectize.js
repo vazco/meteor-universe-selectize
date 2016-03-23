@@ -24,6 +24,13 @@ UniSelectize = function (options) {
 
 };
 
+UniSelectize.prototype.triggerChangeEvent = function(template) {
+    Meteor.defer(function () {
+        $(template.find('select')).change();
+    });
+};
+
+
 UniSelectize.prototype.setItems = function (items, value) {
     if (!_.isArray(items)) {
         console.warn('invalid options format');
@@ -153,11 +160,6 @@ UniSelectize.prototype.itemsAutorun = function () {
 
 UniSelectize.prototype.itemsSelectedAutorun = function (template) {
     var itemsSelected = template.uniSelectize.itemsSelected.get();
-    var $select = $(template.find('select'));
-    Meteor.defer(function () {
-        $select.change();
-    });
-
     template.uniSelectize.inputPosition.set(itemsSelected.length - 1);
 };
 
@@ -168,7 +170,7 @@ UniSelectize.prototype.inputFocus = function (template) {
     });
 };
 
-UniSelectize.prototype.selectItem = function (value) {
+UniSelectize.prototype.selectItem = function (value, template) {
     var items = this.items.get();
     var multiple = this.multiple;
 
@@ -183,9 +185,10 @@ UniSelectize.prototype.selectItem = function (value) {
     });
 
     this.setItems(items);
+    this.triggerChangeEvent(template);
 };
 
-UniSelectize.prototype.unselectItem = function (value, reset) {
+UniSelectize.prototype.unselectItem = function (value, reset, template) {
     var items = this.items.get();
 
     _.each(items, function (item) {
@@ -195,9 +198,10 @@ UniSelectize.prototype.unselectItem = function (value, reset) {
     });
 
     this.setItems(items);
+    this.triggerChangeEvent(template)
 };
 
-UniSelectize.prototype.removeItemBeforeInput = function () {
+UniSelectize.prototype.removeItemBeforeInput = function (template) {
     var items = this.itemsSelected.get();
     var inputPosition = this.inputPosition.get();
     var itemToRemove;
@@ -209,11 +213,11 @@ UniSelectize.prototype.removeItemBeforeInput = function () {
     });
 
     if (itemToRemove) {
-        this.unselectItem(itemToRemove.value);
+        this.unselectItem(itemToRemove.value, false, template);
     }
 };
 
-UniSelectize.prototype.removeItemAfterInput = function () {
+UniSelectize.prototype.removeItemAfterInput = function (template) {
     var items = this.itemsSelected.get();
     var inputPosition = this.inputPosition.get();
     var itemToRemove;
@@ -225,7 +229,7 @@ UniSelectize.prototype.removeItemAfterInput = function () {
     });
 
     if (itemToRemove) {
-        this.unselectItem(itemToRemove.value);
+        this.unselectItem(itemToRemove.value, false, template);
     }
 };
 
@@ -239,7 +243,7 @@ UniSelectize.prototype.selectActiveItem = function (template) {
         return;
     }
 
-    itemToSelect && this.selectItem(itemToSelect.value);
+    itemToSelect && this.selectItem(itemToSelect.value, template);
 
     if (this.multiple) {
         this.open.set(true);
@@ -269,7 +273,7 @@ UniSelectize.prototype.createItem = function (template) {
             var itemsSelected = self.itemsSelected.get();
             Meteor.defer(function () {
                 _.each(itemsSelected, function (item) {
-                    self.selectItem(item.value);
+                    self.selectItem(item.value, template);
                 });
                 self.inputFocus(template);
             });
@@ -283,6 +287,7 @@ UniSelectize.prototype.createItem = function (template) {
     }
 
     this.setItems(items, searchText);
+    this.triggerChangeEvent(template);
 
     if (this.multiple) {
         this.inputFocus(template);
@@ -418,7 +423,8 @@ Template.universeSelectize.onRendered(function () {
 
     this.form = $(template.find('select')).parents('form');
     this.form.bind('reset', function () {
-        template.uniSelectize.unselectItem(null, true);
+        template.uniSelectize.un
+        (null, true);
     });
 });
 
@@ -519,7 +525,7 @@ Template.universeSelectize.events({
             case 8: // backspace
                 if ($input.val() === '') {
                     e.preventDefault();
-                    uniSelectize.removeItemBeforeInput();
+                    uniSelectize.removeItemBeforeInput(template);
                 }
                 uniSelectize.open.set(true);
                 uniSelectize.inputFocus(template);
@@ -528,7 +534,7 @@ Template.universeSelectize.events({
 
             case 46: // delete
                 if ($input.val() === '') {
-                    uniSelectize.removeItemAfterInput();
+                    uniSelectize.removeItemAfterInput(template);
                 }
                 uniSelectize.open.set(true);
                 uniSelectize.inputFocus(template);
@@ -627,7 +633,7 @@ Template.universeSelectize.events({
         var itemsUnselected = template.uniSelectize.getItemsUnselectedFiltered();
         var itemsUnselectedLength = itemsUnselected && itemsUnselected.length;
 
-        template.uniSelectize.selectItem(this.value);
+        template.uniSelectize.selectItem(this.value, template);
         template.uniSelectize.searchText.set('');
         $input.val('');
 
@@ -663,6 +669,6 @@ Template.universeSelectize.events({
         e.preventDefault();
         template.uniSelectize.checkDisabled(template);
 
-        template.uniSelectize.unselectItem(this.value);
+        template.uniSelectize.unselectItem(this.value, false, template);
     }
 });
