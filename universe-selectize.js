@@ -120,7 +120,7 @@ UniSelectize.prototype.removeUnusedItems = function (newItems) {
     });
 
     items = _.filter(items, function (item) {
-        return _.contains(newItemsValues, item.value);
+        return _.contains(newItemsValues, item.value) || item.selected;
     });
 
     this.items.set(items);
