@@ -254,10 +254,26 @@ UniSelectize.prototype.selectActiveItem = function (template) {
     }
 };
 
+UniSelectize.prototype.insertItem = function (item, template) {
+    var items = this.items.get();
+
+    if (!_.find(items, function (obj) {
+            if (obj.value === item.value) {
+                obj.selected = item.selected;
+                return true;
+            }
+            return false;
+        })) {
+        items.push(item);
+    }
+
+    this.setItems(items);
+    this.triggerChangeEvent(template);
+};
+
 UniSelectize.prototype.createItem = function (template) {
     var self = this;
     var searchText = this.searchText.get();
-    var items = this.items.get();
 
     if (!searchText) {
         return false;
@@ -265,30 +281,24 @@ UniSelectize.prototype.createItem = function (template) {
 
     var item = {
         label: searchText,
-        value: searchText
+        value: searchText,
+        selected: true
     };
 
     if (template.uniSelectize.createMethod) {
         Meteor.call(template.uniSelectize.createMethod, searchText, searchText, function (error, value) {
             if (error) {
+                console.error('universe selectize create method error:', error);
                 return;
             }
-            var itemsSelected = self.itemsSelected.get();
-            item.value = value;
 
-            items.push(item);
-            self.setItems(items, item.value);
-            self.triggerChangeEvent(template);
+            Meteor.defer(function () {
+                item.value = value || item.value;
+                self.insertItem(item, template);
+            });
         });
     } else {
-        if (!_.find(items, function (obj) {
-                return obj.value === searchText;
-            })) {
-            items.push(item);
-        }
-
-        this.setItems(items, searchText);
-        this.triggerChangeEvent(template);
+        this.insertItem(item, template);
     }
 
     if (this.multiple) {
