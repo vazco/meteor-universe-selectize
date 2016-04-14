@@ -1,5 +1,6 @@
 /* Meteor need globals */
 /* eslint strict: 0 */
+/* jshint strict: false */
 
 UniSelectize = function (options) {
     this.items           = new ReactiveVar([]);
@@ -268,25 +269,27 @@ UniSelectize.prototype.createItem = function (template) {
     };
 
     if (template.uniSelectize.createMethod) {
-        Meteor.call(template.uniSelectize.createMethod, searchText, searchText, function () {
+        Meteor.call(template.uniSelectize.createMethod, searchText, searchText, function (error, value) {
+            if (error) {
+                return;
+            }
             var itemsSelected = self.itemsSelected.get();
-            Meteor.defer(function () {
-                _.each(itemsSelected, function (item) {
-                    self.selectItem(item.value, template);
-                });
-                self.inputFocus(template);
-            });
+            item.value = value;
+
+            items.push(item);
+            self.setItems(items, item.value);
+            self.triggerChangeEvent(template);
         });
-    }
+    } else {
+        if (!_.find(items, function (obj) {
+                return obj.value === searchText;
+            })) {
+            items.push(item);
+        }
 
-    if (!_.find(items, function (obj) {
-            return obj.value === searchText;
-        })) {
-        items.push(item);
+        this.setItems(items, searchText);
+        this.triggerChangeEvent(template);
     }
-
-    this.setItems(items, searchText);
-    this.triggerChangeEvent(template);
 
     if (this.multiple) {
         this.inputFocus(template);
