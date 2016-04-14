@@ -3,7 +3,7 @@
 Package.describe({
     name: 'vazco:universe-selectize',
     summary: 'Universe select input standalone - with the appearance as selectize. It is for use without autoform.',
-    version: '0.1.14',
+    version: '0.1.15',
     git: 'https://github.com/vazco/meteor-universe-selectize.git'
 });
 
@@ -16,11 +16,7 @@ Package.onUse(function(api) {
         };
     }
 
-    api.use('ecmascript');
-    api.use('less');
-    api.use('templating');
-
-    api.use(['underscore', 'reactive-var'], 'client');
+    api.use(['ecmascript', 'templating', 'underscore', 'less', 'reactive-var'], 'client');
 
     api.addFiles([
         'universe-selectize.html',
@@ -31,5 +27,5 @@ Package.onUse(function(api) {
 
     api.addAssets('img/loading.gif', 'client');
 
-    api.export(['UniSelectize']);
+    api.export(['UniSelectize'], 'client');
 });
