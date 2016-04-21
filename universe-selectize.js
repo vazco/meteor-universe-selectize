@@ -390,10 +390,8 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
         self.loading.set(false);
         if (params) {
             self.removeUnusedItems(options);
-            self.addItems(options);
-        } else {
-            self.addItems(options, values);
         }
+        self.addItems(options, values);
     });
 };
 
