@@ -65,7 +65,6 @@ UniSelectize.prototype.setItems = function (items, value) {
             item.selected = true;
         }
     });
-
     this.items.set(items);
 };
 
@@ -369,7 +368,7 @@ UniSelectize.prototype.transferStyles = function ($from, $to, properties) {
     $to.css(styles);
 };
 
-UniSelectize.prototype.getOptionsFromMethod = function (values) {
+UniSelectize.prototype.getOptionsFromMethod = function (values, callback) {
     var self = this;
     var methodName = this.optionsMethod;
     var searchText = this.searchText.get();
@@ -392,6 +391,9 @@ UniSelectize.prototype.getOptionsFromMethod = function (values) {
             self.removeUnusedItems(options);
         }
         self.addItems(options, values);
+        if (_.isFunction(callback)) {
+            callback(options);
+        }
     });
 };
 
@@ -408,7 +410,9 @@ Template.universeSelectize.onRendered(function () {
         var value = data.value;
 
         if (template.uniSelectize.optionsMethod) {
-            template.uniSelectize.getOptionsFromMethod(value);
+            template.uniSelectize.getOptionsFromMethod(value, function(options) {
+                template.uniSelectize.setItems(options, value);
+            });
         } else {
             var options = data.options;
             template.uniSelectize.setItems(options, value);
@@ -420,7 +424,7 @@ Template.universeSelectize.onRendered(function () {
     });
 
     template.autorun(function () {
-        template.uniSelectize.itemsSelectedAutorun(template)
+        template.uniSelectize.itemsSelectedAutorun(template);
     });
 
     template.autorun(function () {
