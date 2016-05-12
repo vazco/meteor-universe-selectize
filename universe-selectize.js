@@ -161,7 +161,7 @@ UniSelectize.prototype.itemsAutorun = function () {
 };
 
 UniSelectize.prototype.itemsSelectedAutorun = function () {
-    var itemsSelected = template.uniSelectize.itemsSelected.get();
+    var itemsSelected = this.template.uniSelectize.itemsSelected.get();
     this.template.uniSelectize.inputPosition.set(itemsSelected.length - 1);
 };
 
@@ -236,7 +236,7 @@ UniSelectize.prototype.removeItemAfterInput = function () {
     }
 };
 
-UniSelectize.prototype.selectActiveItem = function (template) {
+UniSelectize.prototype.selectActiveItem = function () {
     var itemsUnselected = this.getItemsUnselectedFiltered();
     var activeOption = this.activeOption.get();
     var itemToSelect = itemsUnselected && itemsUnselected[activeOption];
@@ -419,11 +419,11 @@ Template.universeSelectize.onRendered(function () {
     });
 
     template.autorun(function () {
-        template.uniSelectize.itemsAutorun(template);
+        template.uniSelectize.itemsAutorun();
     });
 
     template.autorun(function () {
-        template.uniSelectize.itemsSelectedAutorun(template);
+        template.uniSelectize.itemsSelectedAutorun();
     });
 
     template.autorun(function () {
