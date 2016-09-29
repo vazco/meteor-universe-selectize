@@ -141,9 +141,10 @@ UniSelectize.prototype.itemsAutorun = function () {
         }
     });
 
-    itemsSelected = _.sortBy(itemsSelected, this.sortMethod);
-
-    itemsUnselected = _.sortBy(itemsUnselected, this.sortMethod);
+    if (this.sortMethod) {
+        itemsSelected = _.sortBy(itemsSelected, this.sortMethod);
+        itemsUnselected = _.sortBy(itemsUnselected, this.sortMethod);
+    }
 
     var itemsSelectedPrev = this.itemsSelected.get();
     if (!_.isEqual(itemsSelectedPrev, itemsSelected)) {
