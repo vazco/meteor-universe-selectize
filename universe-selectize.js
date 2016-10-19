@@ -639,6 +639,12 @@ Template.universeSelectize.events({
             template.uniSelectize.open.set(false);
         }, 500);
     },
+    'scroll .selectize-dropdown-content':  function (e, template) {
+        Meteor.clearTimeout(template.uniSelectize.timeoutId);
+        template.uniSelectize.timeoutId = Meteor.setTimeout(function () {
+            template.uniSelectize.open.set(false);
+        }, 5000);
+    },
     'click .selectize-dropdown-content > div:not(.create)': function (e, template) {
         e.preventDefault();
         template.uniSelectize.checkDisabled();
