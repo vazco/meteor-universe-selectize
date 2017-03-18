@@ -9,7 +9,7 @@ maintained by [Vazco](http://www.vazco.eu).
 > It works standalone, but you can get max out of it when using the whole system.
 
 ## Demo
-http://universe-selectize-demo.meteor.com
+http://universe-autoform-select.stg.vazco.eu/
 
 https://github.com/vazco/meteor-universe-selectize-demo.git
 
