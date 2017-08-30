@@ -87,6 +87,12 @@ $ meteor add vazco:universe-selectize
         <td valign="top"><code>true</code></td>
     </tr>
     <tr>
+        <td valign="top"><code>createText</code></td>
+        <td valign="top"><i>Optional. Allows the user to change the create text.</i> </td>
+        <td valign="top"><code>String</code></td>
+        <td valign="top"><code>undefined</code></td>
+    </tr>
+    <tr>
         <td valign="top"><code>createMethod</code></td>
         <td valign="top"><i>Optional. Name of method to call after create new item. Method can return new value for item.</i> </td>
         <td valign="top"><code>String</code></td>
