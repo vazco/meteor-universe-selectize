@@ -15,6 +15,7 @@ UniSelectize = function (options, template) {
     this.optionsMethodParams = new ReactiveVar();
 
     this.create             = options.create;
+    this.createText         = options.createText;
     this.template           = template;
     this.multiple           = options.multiple;
     this.sortMethod         = _.isUndefined(options.sortMethod) ? 'label' : options.sortMethod;
@@ -448,6 +449,10 @@ Template.universeSelectize.onDestroyed(function () {
 });
 
 Template.universeSelectize.helpers({
+    createText: function () {
+        var template = Template.instance();
+        return template.uniSelectize.createText;
+    },
     multiple: function () {
         var template = Template.instance();
         return template.uniSelectize.multiple;
