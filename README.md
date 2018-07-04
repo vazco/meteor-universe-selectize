@@ -1,7 +1,7 @@
 Universe selectize standalone
 =========================
 
-<a href="http://unicms.io"><img src="https://vazco.eu/universe-banner.png" /></a>
+<a href="http://vazco.eu"><img src="https://vazco.eu/universe-banner.png" /></a>
 
 > This package is part of Universe, a framework based on [Meteor platform](http://meteor.com)
 maintained by [Vazco](http://www.vazco.eu).
